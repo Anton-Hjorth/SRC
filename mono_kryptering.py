@@ -1,18 +1,19 @@
 import numpy as np
 import time
-
-setting = 'encrypt'
+set_ = input(': ')
+setting = f'{set_}crypt'
 
 danish_alpha = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Æ','Ø','Å']
 
 def mono_encrypt(text, alphabet):
 
-    random_alpha_key = np.random.permutation(alphabet)
+    random_alpha_key = list(np.random.permutation(alphabet))
     formatted_text = (((text.replace(' ','')).replace('.','')).replace(',','')).replace('"','').upper()
     clean_text = ''.join(c for c in text if c.isalpha()).upper()
     
     encrypted_text = ''
     for letter in clean_text:
+        print(letter, alphabet.index(letter) +1, random_alpha_key[alphabet.index(letter)])
         encrypted_text += random_alpha_key[alphabet.index(letter)]
     return encrypted_text, ''.join(random_alpha_key)
 
