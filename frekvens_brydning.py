@@ -46,27 +46,25 @@ def calculate_frequencies(text):
     for i in list(frequencies_danish.keys()):
         if i not in list(frequencies.keys()):
             frequencies[i] = 0.0
-
     return {k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)} #Måde at sorterer efter value størrelse
     
 
 def match_fequencies(text, text_freq, danish_freq):
-    #print(danish_freq)
-    #print(text_freq)
     solved_text = ''
-    fem_første_da = list(danish_freq.keys())[:5]
-    fem_første_te = list(text_freq.keys())[:5]
-    print(fem_første_te, fem_første_da)
-    for letter in text:
-        #solved_text += list(danish_freq.keys())[list(text_freq.keys()).index(letter)]
-        if letter in fem_første_te:
-            
-            solved_text += fem_første_da[fem_første_te.index(letter)]
-        solved_text += letter
-    print(solved_text)
+
+    for letter in text:            
+        solved_text += list(danish_freq.keys())[list(text_freq.keys()).index(letter)]
+
+    return solved_text, text_freq
 
 
 if decrypted_input == '':
-    match_fequencies(encrypted_input, calculate_frequencies(encrypted_input), frequencies_danish)
+    attempted_decryption, frequencies_text = match_fequencies(encrypted_input, calculate_frequencies(encrypted_input), frequencies_danish)
+    
 else:
-    match_fequencies(encrypted_input, calculate_frequencies(encrypted_input), calculate_frequencies(decrypted_input))
+    attempted_decryption, frequencies_text = match_fequencies(encrypted_input, calculate_frequencies(encrypted_input), calculate_frequencies(decrypted_input))
+print('Danske frekvenser:')
+print(frequencies_danish)
+print('Tekstens frekvenser:')
+print(frequencies_text)
+print(attempted_decryption)
