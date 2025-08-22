@@ -3,6 +3,10 @@ import numpy as np
 print(list('gsggs'))
 encrypted_input = input('Krypteret tekst (polyalfabetisk): ')
 key_length = int(input('Key længde: '))
+
+
+
+
 frequencies_danish = {
     'E': 16.70,
     'R': 7.61,
@@ -48,7 +52,7 @@ def retrieve_substring_mono_alphabet(text, key_length, start_index):
         substring_mono_alpha += letter
         letter_indexes.append(start_index+index*key_length)
         index_substring_tuples.append((letter,start_index+index*key_length))
-    print(letter_indexes)
+    print('Letter indexes:',letter_indexes)
     return substring_mono_alpha, letter_indexes, index_substring_tuples
 
 def calculate_frequencies(text):
@@ -60,7 +64,7 @@ def calculate_frequencies(text):
     for i in list(frequencies_danish.keys()):
         if i not in list(frequencies.keys()):
             frequencies[i] = 0.0
-    print({k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)})
+    print('Frekvenser: ',{k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)})
     return {k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)}
 
 def match_fequencies(text, text_freq, danish_freq):
@@ -72,24 +76,25 @@ def match_fequencies(text, text_freq, danish_freq):
     return solved_text
 
 solved_complete_string = ' ' * len(encrypted_input)
-for start_index in range(len(encrypted_input)//key_length):
+#for start_index in range(len(encrypted_input)//key_length):
+for start_index in range(key_length):
     print(f'{start_index} of {len(encrypted_input)-1} total')
     substring_mono_alpha, letter_indexes, index_substring_tuples = retrieve_substring_mono_alphabet(encrypted_input, key_length, start_index)
     frequencies = calculate_frequencies(substring_mono_alpha)
     solved_sub_string = match_fequencies(substring_mono_alpha, frequencies, frequencies_danish)
-    print(substring_mono_alpha)
-    print(solved_sub_string)
+    print('substring',substring_mono_alpha)
+    print('(de)crypted substring',solved_sub_string)
     #print(list('j'+solved_complete_string*len(encrypted_input)+'j'))
     #print(index_substring_tuples[0])
 
     for i in range(len(solved_sub_string)):
-        print(list(solved_complete_string))
-        print(letter_indexes[i])
-        tmp_arr = list(solved_complete_string)[letter_indexes[i]] = solved_sub_string[i]
-        
+        #print('solved_complete indtil videre:',list(solved_complete_string)[letter_indexes[i]])
+        #print('Length:',len(list(solved_complete_string)))
+        #print('letter_indexes current:',letter_indexes[i])
+        tmp_arr = (list(solved_complete_string))
+        tmp_arr[letter_indexes[i]] = solved_sub_string[i]
         solved_complete_string = ''.join(tmp_arr)
-        
-    
-
-string = 'antonhjorthostersen'
+    #print(solved_complete_string)
+    print('--------------------------------------------------')
+print(solved_complete_string)
 #print(string[0:len(string):2])
