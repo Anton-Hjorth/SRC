@@ -1,11 +1,10 @@
 import numpy as np
 
-print(list('gsggs'))
 encrypted_input = input('Krypteret tekst (polyalfabetisk): ')
 key_length = int(input('Key længde: '))
 
 
-
+danish_alpha = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Æ','Ø','Å']
 
 frequencies_danish = {
     'E': 16.70,
@@ -42,18 +41,11 @@ frequencies_danish = {
 def retrieve_substring_mono_alphabet(text, key_length, start_index):
     letter_indexes = []
     substring_mono_alpha = ''
-    index_substring_tuples = []
-    #substring_mono_alpha = text[start_index:len(text):key_length]
-    #for letter in substring_mono_alpha:
-    #    letter_indexes.append(start_index*key_length)
-    #print(letter_indexes)
-
+    text = ''.join(c for c in text if c.isalpha()).upper()
     for index, letter in enumerate(text[start_index:len(text):key_length]):
         substring_mono_alpha += letter
         letter_indexes.append(start_index+index*key_length)
-        index_substring_tuples.append((letter,start_index+index*key_length))
-    print('Letter indexes:',letter_indexes)
-    return substring_mono_alpha, letter_indexes, index_substring_tuples
+    return substring_mono_alpha, letter_indexes
 
 def calculate_frequencies(text):
     frequencies = {}
@@ -64,37 +56,43 @@ def calculate_frequencies(text):
     for i in list(frequencies_danish.keys()):
         if i not in list(frequencies.keys()):
             frequencies[i] = 0.0
-    print('Frekvenser: ',{k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)})
     return {k: v for k, v in sorted(frequencies.items(), key=lambda item: item[1], reverse=True)}
 
-def match_fequencies(text, text_freq, danish_freq):
-    solved_text = ''
+def return_most_common(text_freq):
+    return list(text_freq.items())[0][0]
 
-    for letter in text:            
-        solved_text += list(danish_freq.keys())[list(text_freq.keys()).index(letter)]
 
-    return solved_text
+def recreate_key():
+    most_common_letter_shifts = []
+    reconstructed_key = ''
 
-solved_complete_string = ' ' * len(encrypted_input)
-#for start_index in range(len(encrypted_input)//key_length):
-for start_index in range(key_length):
-    print(f'{start_index} of {len(encrypted_input)-1} total')
-    substring_mono_alpha, letter_indexes, index_substring_tuples = retrieve_substring_mono_alphabet(encrypted_input, key_length, start_index)
-    frequencies = calculate_frequencies(substring_mono_alpha)
-    solved_sub_string = match_fequencies(substring_mono_alpha, frequencies, frequencies_danish)
-    print('substring',substring_mono_alpha)
-    print('(de)crypted substring',solved_sub_string)
-    #print(list('j'+solved_complete_string*len(encrypted_input)+'j'))
-    #print(index_substring_tuples[0])
+    for start_index in range(key_length):
+        substring_mono_alpha, letter_indexes = retrieve_substring_mono_alphabet(encrypted_input, key_length, start_index)
+        text_frequencies = calculate_frequencies(substring_mono_alpha)
+        most_common_letter  = return_most_common(text_frequencies)
+        most_common_letter_shifts.append(danish_alpha.index(most_common_letter) - danish_alpha.index('E'))
+        
+        reconstructed_key += danish_alpha[most_common_letter_shifts[start_index]]
+        print('frekvenser:',text_frequencies)
+        print('Current substring:',substring_mono_alpha)
+        print('Substring letter indexes in full string',letter_indexes)
+        print('----------------------')
+    return reconstructed_key
 
-    for i in range(len(solved_sub_string)):
-        #print('solved_complete indtil videre:',list(solved_complete_string)[letter_indexes[i]])
-        #print('Length:',len(list(solved_complete_string)))
-        #print('letter_indexes current:',letter_indexes[i])
-        tmp_arr = (list(solved_complete_string))
-        tmp_arr[letter_indexes[i]] = solved_sub_string[i]
-        solved_complete_string = ''.join(tmp_arr)
-    #print(solved_complete_string)
-    print('--------------------------------------------------')
-print(solved_complete_string)
-#print(string[0:len(string):2])
+def decryption(key, text, alphabet):
+    decrypted_text = ''
+
+    alpha_to_cycle = alphabet
+
+    key_repeated = key * (len(text)//len(key)+1)
+    index_count = 0
+    for letter in text:
+        _alpha_to_cycle = list(np.roll(alpha_to_cycle,alphabet.index(key_repeated[index_count])))
+        decrypted_text += _alpha_to_cycle[alphabet.index(letter)]
+        index_count += 1
+    return decrypted_text
+
+
+reconstructed_key = recreate_key()
+print(reconstructed_key)
+print(decryption(reconstructed_key, encrypted_input, danish_alpha))
